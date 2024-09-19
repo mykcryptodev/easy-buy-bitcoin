@@ -38,7 +38,7 @@ export const Stats: FC<Props> = ({ priceChange, btcPrice }) => {
 
   return (
     <div className="stats-container px-8 overflow-x-auto">
-      <div className="stats bg-transparent flex-nowrap">
+      <div className="stats sm:bg-transparent sm:shadow-none shadow-md my-4 flex-nowrap">
         <div className="stat">
           <div className="stat-title text-sm">BTC Price</div>
           <div className="stat-figure text-secondary">
