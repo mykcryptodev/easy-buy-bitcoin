@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import type { FC } from "react";
 import { Buy } from "~/components/Buy";
 import { Sell } from "~/components/Sell";
-import Sparkline from "~/components/Sparkline";
 import AnimatedNumber from "~/components/AnimatedNumber";
 import { api } from "~/utils/api";
-import { Position } from "~/components/Position";
 import Wallet from "~/components/Wallet";
 import { useAccount } from "wagmi";
+import dynamic from "next/dynamic";
+
+const PriceChart = dynamic(() => import("~/components/PriceChart"), { ssr: false });
 
 const Home: FC = () => {
   const { address } = useAccount();
@@ -31,13 +32,13 @@ const Home: FC = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center">
-        {address && (<Wallet />)}
+        {address && (<Wallet className="z-10" />)}
         {data && (
-          <div className="absolute w-full h-full -z-10 opacity-40">
-            <Sparkline data={data.sparkline_in_7d.price} />
+          <div className="absolute w-full h-full">
+            <PriceChart />
           </div>
         )}
-        <div className="container flex flex-col items-center justify-center gap-2 px-4 py-16">
+        <div className="flex flex-col items-center justify-center max-w-md gap-2 z-10 rounded-2xl">
           <div className="text-7xl tracking-tighter font-bold">Buy Bitcoin</div>
           <div className="flex items-center gap-2 mb-8">
             <div className="text-4xl font-bold">
@@ -77,7 +78,6 @@ const Home: FC = () => {
           {activeAction === "sell" && (
             <Sell goBack={() => setActiveAction(undefined)} />
           )}
-          <Position />
         </div>
       </main>
     </>

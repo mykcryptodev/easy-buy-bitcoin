@@ -14,11 +14,14 @@ import {
 import { color } from '@coinbase/onchainkit/theme';
 import { useAccount } from "wagmi";
  
-export function Wallet() {
+type Props = {
+  className?: string;
+};
+export function Wallet({ className }: Props) {
   const account = useAccount();
 
   return (
-    <div className="flex items-center gap-2">
+    <div className={`flex items-center gap-2 ${className}`}>
       <OnchainKitWallet>
         <ConnectWallet className={`bg-none! ${account?.address ? '' : 'p-0'} text-primary-content!`}>
           <ConnectWalletText className="btn btn-lg w-full btn-primary">Sign In</ConnectWalletText>
