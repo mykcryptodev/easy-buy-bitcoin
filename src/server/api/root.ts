@@ -1,5 +1,5 @@
 import { coingeckoRouter } from "~/server/api/routers/coingecko";
-import { etherRouter } from "~/server/api/routers/ether";
+import { chainlinkRouter } from "~/server/api/routers/chainlink";
 import { kyberswapRouter } from "~/server/api/routers/kyberswap";
 import { moralisRouter } from "~/server/api/routers/moralis";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
@@ -11,7 +11,7 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
  */
 export const appRouter = createTRPCRouter({
   coingecko: coingeckoRouter,
-  ether: etherRouter,
+  chainlink: chainlinkRouter,
   kyberswap: kyberswapRouter,
   moralis: moralisRouter,
 });

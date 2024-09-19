@@ -2,11 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Segment';
+  src: url('/fonts/Segment-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Segment';
+  src: url('/fonts/Segment-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+body {
+  font-family: 'Segment', sans-serif;
+}
+
+.svg-fill-base svg path {
+  fill: theme('colors.base-content');
+}
+
 /* remove up and down arrows from number inputs */
 @layer base {
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  }
+  .stats-container::-webkit-scrollbar { /* WebKit */
+    width: 0;
+    height: 0;
+  }
+  .stats {
+    width: max-content;
   }
 }

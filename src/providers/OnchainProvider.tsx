@@ -11,7 +11,7 @@ export const wagmiConfig = createConfig({
   multiInjectedProviderDiscovery: false,
   connectors: [
     coinbaseWallet({
-      appName: 'yourAppName',
+      appName: 'Buy Bitcoin',
       preference: 'smartWalletOnly',
       version: '4',
     }),

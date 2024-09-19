@@ -3,7 +3,8 @@ import {
   ConnectWalletText, 
   Wallet as OnchainKitWallet, 
   WalletDropdown, 
-  WalletDropdownDisconnect, 
+  WalletDropdownDisconnect,
+  WalletDropdownFundLink, 
 } from '@coinbase/onchainkit/wallet'; 
 import {
   Address,
@@ -25,8 +26,8 @@ export function Wallet({ className }: Props) {
       <OnchainKitWallet>
         <ConnectWallet className={`bg-none! ${account?.address ? '' : 'p-0'} text-primary-content!`}>
           <ConnectWalletText className="btn btn-lg w-full btn-primary">Sign In</ConnectWalletText>
-          <Avatar className="h-6 w-6" />
-          <Name />
+          <Avatar className="h-6 w-6 svg-fill-base" />
+          <Name className="text-base!" />
         </ConnectWallet>
         <WalletDropdown>
           <Identity className="px-4 pt-3 pb-2" hasCopyAddressOnClick>
@@ -35,6 +36,7 @@ export function Wallet({ className }: Props) {
             <Address className={color.foregroundMuted} />
           </Identity>
           <WalletDropdownDisconnect />
+          <WalletDropdownFundLink />
         </WalletDropdown>
       </OnchainKitWallet>
       {!account.address && (

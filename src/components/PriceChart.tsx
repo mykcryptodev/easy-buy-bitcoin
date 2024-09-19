@@ -166,6 +166,58 @@ export const PriceChart: FC = () => {
             colorStops: []
           }
         },
+        annotations: {
+          points: [
+            {
+              x: aggregatedData[0]![0], // Use the timestamp of the first data point
+              y: aggregatedData[0]![1],
+              marker: {
+                size: 6,
+                fillColor: "#fff",
+                strokeColor: "#ff0000",
+              },
+              label: {
+                borderColor: "#ff0000",
+                offsetY: 0,
+                style: {
+                  color: "#fff",
+                  background: "#ff0000",
+                  padding: {
+                    left: 5,
+                    right: 5,
+                    top: 2,
+                    bottom: 2,
+                  },
+                },
+                text: `Sell! $${aggregatedData[0]![1]!.toFixed(2)}`,
+              }
+            },
+            {
+              x: aggregatedData[aggregatedData.length - 1]![0],
+              y: aggregatedData[aggregatedData.length - 1]![1],
+              marker: {
+                size: 6,
+                fillColor: "#fff",
+                strokeColor: "#000",
+              },
+              label: {
+                borderColor: "#000",
+                offsetY: 0,
+                style: {
+                  color: "#fff",
+                  background: "#000",
+                  padding: {
+                    left: 5,
+                    right: 5,
+                    top: 2,
+                    bottom: 2,
+                  },
+                },
+                text: `Buy! $${aggregatedData[aggregatedData.length - 1]![1]!.toFixed(2)}`,
+              }
+            }
+          ]
+        },
       } as ApexOptions,
     };
   }, [aggregatedData]);

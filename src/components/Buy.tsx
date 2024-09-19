@@ -1,26 +1,29 @@
 import {
   Transaction,
   TransactionButton,
-  TransactionSponsor,
   TransactionToast,
   TransactionToastAction,
   TransactionToastIcon,
   TransactionToastLabel,
 } from "@coinbase/onchainkit/transaction";
 import { type FC, useMemo, useState } from "react";
-import { base } from "thirdweb/chains";
-import { useActiveAccount } from "thirdweb/react";
 import { CB_BTC } from "~/constants";
 import { api } from "~/utils/api";
+import { useAccount } from "wagmi";
+import { base } from "viem/chains";
 import { parseEther, zeroAddress } from "viem";
 import useDebounce from "~/hooks/useDebounce";
+import { env } from "~/env";
+import { ArrowLeft02Icon } from "hugeicons-react";
 
 type Props = {
   goBack: () => void;
 };
 export const Buy: FC<Props> = ({ goBack }) => {
-  const account = useActiveAccount();
-  const { data: etherPrice } = api.ether.getPrice.useQuery();
+  const account = useAccount();
+  const { data: etherPrice } = api.chainlink.getAssetPrice.useQuery({
+    asset: "ETH",
+  });
 
   const [amount, setAmount] = useState<string>("");
   const debouncedAmount = useDebounce(amount, 500);
@@ -67,7 +70,8 @@ export const Buy: FC<Props> = ({ goBack }) => {
 
   return (
     <div className="flex flex-col items-start gap-2">
-      <button className="btn btn-secondary btn-xs" onClick={goBack}>
+      <button className="btn btn-neutral btn-xs btn-ghost" onClick={goBack}>
+        <ArrowLeft02Icon size={18} /> 
         Go back
       </button>
       <label htmlFor="buyAmount" className="text-sm font-medium">
@@ -83,12 +87,20 @@ export const Buy: FC<Props> = ({ goBack }) => {
         className="input input-lg input-bordered"
         placeholder="Enter amount in USD"
       />
-      <Transaction chainId={base.id} calls={calls}>
+      <Transaction 
+        chainId={base.id} 
+        calls={calls}
+        capabilities={{
+          paymasterService: {
+            url: env.NEXT_PUBLIC_CDP_PAYMASTER_URL,
+          }
+        }}
+      >
         <TransactionButton
-          text={`${encodedDataIsLoading ? "Loading..." : "Buy"}`}
+          text={`${encodedDataIsLoading ? "Loading..." : `Buy ${Number(amount).toLocaleString([], { style: "currency", currency: "USD" })} of Bitcoin`}`}
           disabled={encodedDataIsLoading}
+          className="bg-none! hover:bg-none! p-0 text-primary-content! btn btn-primary btn-lg"
         />
-        <TransactionSponsor />
         <TransactionToast>
           <TransactionToastIcon />
           <TransactionToastLabel />
