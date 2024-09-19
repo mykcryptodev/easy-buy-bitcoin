@@ -20,6 +20,7 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_THIRDWEB_CLIENT_ID: z.string(),
+    NEXT_PUBLIC_CDP_API_KEY: z.string(),
   },
 
   /**
@@ -32,6 +33,7 @@ export const env = createEnv({
     KYBERSWAP_CLIENT_ID: process.env.KYBERSWAP_CLIENT_ID,
     MORALIS_API_KEY: process.env.MORALIS_API_KEY,
     NEXT_PUBLIC_THIRDWEB_CLIENT_ID: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID,
+    NEXT_PUBLIC_CDP_API_KEY: process.env.NEXT_PUBLIC_CDP_API_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

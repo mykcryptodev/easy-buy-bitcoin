@@ -1,16 +1,17 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
-import { ConnectButton } from "thirdweb/react";
 import type { FC } from "react";
 import { Buy } from "~/components/Buy";
 import { Sell } from "~/components/Sell";
 import Sparkline from "~/components/Sparkline";
 import AnimatedNumber from "~/components/AnimatedNumber";
-import { client } from "~/constants";
 import { api } from "~/utils/api";
 import { Position } from "~/components/Position";
+import Wallet from "~/components/Wallet";
+import { useAccount } from "wagmi";
 
 const Home: FC = () => {
+  const { address } = useAccount();
   const [price, setPrice] = useState<number>(45000);
   const { data } = api.coingecko.getTokenCardDataById.useQuery({
     id: "coinbase-wrapped-btc",
@@ -30,13 +31,7 @@ const Home: FC = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center">
-        <ConnectButton 
-          client={client} 
-          theme="light"
-          connectModal={{
-            showThirdwebBranding: false,
-          }}
-        />
+        {address && (<Wallet />)}
         {data && (
           <div className="absolute w-full h-full -z-10 opacity-40">
             <Sparkline data={data.sparkline_in_7d.price} />
@@ -58,7 +53,7 @@ const Home: FC = () => {
               )}
             </div>
           </div>
-          {!activeAction && (
+          {(!activeAction && address) ? (
             <div className="flex justify-center w-full max-w-md items-center gap-2">
               <button 
                 className="btn btn-lg w-1/2 btn-primary"
@@ -73,6 +68,8 @@ const Home: FC = () => {
                 Sell
               </button>
             </div>
+          ) : (
+            <Wallet />
           )}
           {activeAction === "buy" && (
             <Buy goBack={() => setActiveAction(undefined)} />

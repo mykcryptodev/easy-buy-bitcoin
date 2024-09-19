@@ -171,7 +171,7 @@ export const kyberswapRouter = createTRPCRouter({
       deadline: z.number().optional(),
       slippage: z.number().optional(),
     }))
-    .mutation(async ({ input }) => {
+    .query(async ({ input }) => {
       const { tokensToBuy, from, to, chainId } = input;
       if (!tokensToBuy || !from || !to || !chainId) {
         throw new Error('Missing required parameters');
