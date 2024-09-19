@@ -8,6 +8,9 @@ import Wallet from "~/components/Wallet";
 import { useAccount } from "wagmi";
 import dynamic from "next/dynamic";
 import Stats from "~/components/Stats";
+import { zeroAddress } from "viem";
+import { base } from "viem/chains";
+import { CB_BTC } from "~/constants";
 
 const PriceChart = dynamic(() => import("~/components/PriceChart"), { ssr: false });
 
@@ -22,6 +25,18 @@ const Home: FC = () => {
     setPrice(data.current_price);
   }, [data, data?.current_price]);
 
+  const { data: pnl } = api.moralis.getWalletPnl.useQuery({
+    address: address ?? zeroAddress,
+    chainId: base.id,
+    tokens: [CB_BTC],
+  }, {
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    enabled: !!address,
+  });
+
+  console.log({ pnl });
+
   const [activeAction, setActiveAction] = useState<"buy" | "sell" | undefined>();
   
   return (
@@ -34,7 +49,7 @@ const Home: FC = () => {
       <main className="flex w-full min-h-screen justify-center">
         {data && (
           <div className="absolute w-full h-full">
-            <PriceChart />
+            <PriceChart buys={pnl?.buys} sells={pnl?.sells} />
           </div>
         )}
         <div className="flex flex-col sm:mt-40 mt-20">

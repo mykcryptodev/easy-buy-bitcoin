@@ -3,6 +3,7 @@ import ReactApexChart from "react-apexcharts";
 import { CB_BTC_COINGECKO_ID } from "~/constants";
 import { api } from "~/utils/api";
 import type { ApexOptions } from "apexcharts";
+import { type GetWalletTokenTransfersResponseAdapter } from "moralis/common-evm-utils";
 
 // Add this type definition at the top of the file
 type SeriesData = {
@@ -10,7 +11,12 @@ type SeriesData = {
   data: (number | null)[];
 };
 
-export const PriceChart: FC = () => {
+type Props = {
+  buys?: GetWalletTokenTransfersResponseAdapter['result'];
+  sells?: GetWalletTokenTransfersResponseAdapter['result'];
+}
+
+export const PriceChart: FC<Props> = ({ buys, sells }) => {
   const [days, setDays] = useState<number | undefined>(180);
   const { data: rawData } = api.coingecko.getMarketChart.useQuery({ 
     id: CB_BTC_COINGECKO_ID, 
@@ -49,6 +55,55 @@ export const PriceChart: FC = () => {
 
   const options = useMemo(() => {
     if (!aggregatedData) return null;
+
+    const buyAnnotations = buys?.map(buy => {
+      const buyTime = new Date(buy.blockTimestamp).getTime();
+      const closestDataPoint = aggregatedData.reduce((prev, curr) => 
+        Math.abs(curr[0]! - buyTime) < Math.abs(prev[0]! - buyTime) ? curr : prev
+      );
+      return {
+        x: closestDataPoint[0],
+        y: closestDataPoint[1],
+        marker: {
+          size: 6,
+          fillColor: "#fff",
+          strokeColor: "#36D399",
+        },
+        label: {
+          borderColor: "#36D399",
+          style: {
+            color: "#fff",
+            background: "#36D399",
+          },
+          text: `Buy`,
+        }
+      };
+    }) ?? [];
+
+    const sellAnnotations = sells?.map(sell => {
+      const sellTime = new Date(sell.blockTimestamp).getTime();
+      const closestDataPoint = aggregatedData.reduce((prev, curr) => 
+        Math.abs(curr[0]! - sellTime) < Math.abs(prev[0]! - sellTime) ? curr : prev
+      );
+      return {
+        x: closestDataPoint[0],
+        y: closestDataPoint[1],
+        marker: {
+          size: 6,
+          fillColor: "#fff",
+          strokeColor: "#F87272",
+        },
+        label: {
+          borderColor: "#F87272",
+          style: {
+            color: "#fff",
+            background: "#F87272",
+          },
+          text: `Sell`,
+        }
+      };
+    }) ?? [];
+
     return {
       series: [{
         name: "Bitcoin",
@@ -167,60 +222,11 @@ export const PriceChart: FC = () => {
           }
         },
         annotations: {
-          points: [
-            {
-              x: aggregatedData[0]![0], // Use the timestamp of the first data point
-              y: aggregatedData[0]![1],
-              marker: {
-                size: 6,
-                fillColor: "#fff",
-                strokeColor: "#ff0000",
-              },
-              label: {
-                borderColor: "#ff0000",
-                offsetY: 0,
-                style: {
-                  color: "#fff",
-                  background: "#ff0000",
-                  padding: {
-                    left: 5,
-                    right: 5,
-                    top: 2,
-                    bottom: 2,
-                  },
-                },
-                text: `Sell! $${aggregatedData[0]![1]!.toFixed(2)}`,
-              }
-            },
-            {
-              x: aggregatedData[aggregatedData.length - 1]![0],
-              y: aggregatedData[aggregatedData.length - 1]![1],
-              marker: {
-                size: 6,
-                fillColor: "#fff",
-                strokeColor: "#000",
-              },
-              label: {
-                borderColor: "#000",
-                offsetY: 0,
-                style: {
-                  color: "#fff",
-                  background: "#000",
-                  padding: {
-                    left: 5,
-                    right: 5,
-                    top: 2,
-                    bottom: 2,
-                  },
-                },
-                text: `Buy! $${aggregatedData[aggregatedData.length - 1]![1]!.toFixed(2)}`,
-              }
-            }
-          ]
+          points: [...buyAnnotations, ...sellAnnotations],
         },
       } as ApexOptions,
     };
-  }, [aggregatedData]);
+  }, [aggregatedData, buys, sells]);
 
   if (typeof window === 'undefined' || !isMounted) return null;
   

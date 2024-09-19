@@ -1,13 +1,12 @@
 import { z } from "zod";
 import Moralis from "moralis";
-
 import {
   createTRPCRouter,
   publicProcedure,
 } from "~/server/api/trpc";
 import { env } from "~/env";
-import { toHex } from "thirdweb";
-import { CB_BTC } from "~/constants";
+import { getAddress, type Hex, toHex } from "thirdweb";
+import { isAddressEqual } from "viem";
 
 export const moralisRouter = createTRPCRouter({
   getWalletNetworth: publicProcedure
@@ -81,5 +80,52 @@ export const moralisRouter = createTRPCRouter({
         result: data.result?.filter(item => item.token_address !== "0x4200000000000000000000000000000000000006")
       };
       return filteredData;
+    }),
+  getWalletPnl: publicProcedure
+    .input(z.object({
+      chainId: z.number(),
+      address: z.string(),
+      tokens: z.array(z.string()).optional(),
+    }))
+    .query(async ({ input }) => {
+      console.log({ input });
+      const { chainId, address, tokens } = input;
+      if (!address) return null;
+      if (!Moralis.Core.isStarted) {
+        await Moralis.start({
+          apiKey: env.MORALIS_API_KEY,
+        });
+      }
+      
+      // let cursor: string | undefined;
+      // const allTransfers: GetWalletTokenTransfersResponseAdapter['result'] = [];
+
+      // do {
+      //   const response = await Moralis.EvmApi.token.getWalletTokenTransfers({
+      //     chain: toHex(chainId),
+      //     address,
+      //     contractAddresses: tokens,
+      //     cursor,
+      //   });
+
+      //   allTransfers.push(...response.result);
+      //   cursor = response.pagination.cursor;
+      // } while (cursor !== undefined);
+      const response = await Moralis.EvmApi.token.getWalletTokenTransfers({
+        chain: toHex(chainId),
+        order: "DESC",
+        address: getAddress(address),
+        contractAddresses: tokens?.map(getAddress),
+        // cursor,
+      });
+
+      // allTransfers.push(...response.result);
+      // cursor = response.pagination.cursor;
+
+      const buys = response.result.filter(transfer => isAddressEqual(transfer.toAddress.checksum, getAddress(address)));
+      const sells = response.result.filter(transfer => isAddressEqual(transfer.fromAddress.checksum, getAddress(address)));
+      console.log({ sells });
+
+      return { buys, sells }
     }),
 });
