@@ -5,7 +5,6 @@ import { api } from "~/utils/api";
 import type { ApexOptions } from "apexcharts";
 import { type GetWalletTokenTransfersResponseAdapter } from "moralis/common-evm-utils";
 
-// Add this type definition at the top of the file
 type SeriesData = {
   name: string;
   data: (number | null)[];
@@ -74,7 +73,15 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
             color: "#fff",
             background: "#36D399",
           },
-          text: `Buy`,
+          text: 'Buy',
+          textAnchor: 'middle',
+          position: 'top',
+          offsetY: -10,
+          orientation: 'vertical',
+          show: false,
+          hover: {
+            show: true,
+          },
         }
       };
     }) ?? [];
@@ -98,7 +105,15 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
             color: "#fff",
             background: "#F87272",
           },
-          text: `Sell`,
+          text: 'Sell',
+          textAnchor: 'middle',
+          position: 'top',
+          offsetY: -10,
+          orientation: 'vertical',
+          show: false,
+          hover: {
+            show: true,
+          },
         }
       };
     }) ?? [];
@@ -146,7 +161,6 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
           },
         },
         yaxis: {
-          opposite: true,
           labels: {
             formatter: (value: number) => {
               return `$${value.toLocaleString(undefined, {
