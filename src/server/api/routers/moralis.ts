@@ -5,7 +5,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { env } from "~/env";
-import { getAddress, type Hex, toHex } from "thirdweb";
+import { getAddress, toHex } from "thirdweb";
 import { isAddressEqual } from "viem";
 
 export const moralisRouter = createTRPCRouter({

@@ -16,7 +16,7 @@ const client = createThirdwebClient({
 const getOracleAddress = (asset: string) => {
   switch (asset) {
     case "ETH":
-      return "0xf403008d7142c890f4acf6b90d85591db4d7b7e3";
+      return "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419";
     default:
       return "0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c"; // BTC / USD
   }

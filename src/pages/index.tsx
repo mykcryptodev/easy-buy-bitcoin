@@ -17,7 +17,7 @@ const PriceChart = dynamic(() => import("~/components/PriceChart"), { ssr: false
 const Home: FC = () => {
   const { address } = useAccount();
   const [price, setPrice] = useState<number>(45000);
-  const { data } = api.coingecko.getTokenCardDataById.useQuery({
+  const { data, refetch: refetchPnl } = api.coingecko.getTokenCardDataById.useQuery({
     id: "coinbase-wrapped-btc",
   });
   useEffect(() => {
@@ -35,7 +35,12 @@ const Home: FC = () => {
     enabled: !!address,
   });
 
-  console.log({ pnl });
+  const [statsKey, setStatsKey] = useState<number>(0);
+
+  const refetchData = () => {
+    void refetchPnl();
+    setStatsKey((prev) => prev + 1);
+  };
 
   const [activeAction, setActiveAction] = useState<"buy" | "sell" | undefined>();
   
@@ -57,13 +62,14 @@ const Home: FC = () => {
           <div className="flex flex-col items-center justify-center max-w-md gap-2 z-10 rounded-2xl">
             {data && (
               <Stats
+                key={statsKey}
                 priceChange={data.price_change_percentage_24h}
                 btcPrice={price}
               />
             )}
             <div className="text-7xl tracking-tighter font-bold my-8">Buy Bitcoin</div>
             {(!activeAction && address) && (
-              <div className="flex justify-center w-full max-w-md items-center gap-2">
+              <div className="flex justify-center w-full max-w-xs sm:max-w-md items-center gap-2">
                 <button 
                   className="btn btn-lg w-1/2 btn-primary"
                   onClick={() => setActiveAction("buy")}
@@ -82,10 +88,16 @@ const Home: FC = () => {
               <Wallet />
             )}
             {activeAction === "buy" && (
-              <Buy goBack={() => setActiveAction(undefined)} />
+              <Buy 
+                goBack={() => setActiveAction(undefined)} 
+                onSuccess={() => void refetchData()}
+              />
             )}
             {activeAction === "sell" && (
-              <Sell goBack={() => setActiveAction(undefined)} />
+              <Sell 
+                goBack={() => setActiveAction(undefined)} 
+                onSuccess={() => void refetchData()}
+              />
             )}
           </div>
         </div>

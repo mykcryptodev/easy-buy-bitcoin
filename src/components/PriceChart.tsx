@@ -17,10 +17,9 @@ type Props = {
 }
 
 export const PriceChart: FC<Props> = ({ buys, sells }) => {
-  const [days, setDays] = useState<number | undefined>(180);
   const { data: rawData } = api.coingecko.getMarketChart.useQuery({ 
-    id: CB_BTC_COINGECKO_ID, 
-    days,
+    id: CB_BTC_COINGECKO_ID,
+    days: 365,
   }, {
     refetchOnWindowFocus: false,
     refetchOnMount: false,

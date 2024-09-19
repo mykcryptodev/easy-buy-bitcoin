@@ -161,8 +161,9 @@ export const kyberswapRouter = createTRPCRouter({
     }),
   getCheckoutData: publicProcedure
     .input(z.object({
+      tokenToSellAddress: z.string(),
       tokensToBuy: z.array(z.object({
-        token: z.string(),
+        address: z.string(),
         amount: z.string(),
       })),
       from: z.string(),
@@ -172,7 +173,7 @@ export const kyberswapRouter = createTRPCRouter({
       slippage: z.number().optional(),
     }))
     .query(async ({ input }) => {
-      const { tokensToBuy, from, to, chainId } = input;
+      const { tokensToBuy, from, to, chainId, tokenToSellAddress } = input;
       if (!tokensToBuy || !from || !to || !chainId) {
         throw new Error('Missing required parameters');
       }
@@ -180,7 +181,6 @@ export const kyberswapRouter = createTRPCRouter({
       const deadline = input.deadline ?? new Date().getTime() + 20 * 60 * 1000;
       const slippage = input.slippage ?? 500; // 5%
 
-      const tokenIn = NATIVE_TOKEN_ADDRESS;
       const chainName = CHAIN_NAME_MAP[chainId];
 
       if (!chainName) {
@@ -190,8 +190,8 @@ export const kyberswapRouter = createTRPCRouter({
       // for each token to buy, get the swap route and encoded data
       const swapRoutes = await Promise.all(tokensToBuy.map(async (token) => {
         const amountIn = token.amount;
-        const tokenAddress = token.token;
-        const swapRoute = await getSwapRoute(chainName, tokenIn, tokenAddress, amountIn);
+        const tokenAddress = token.address;
+        const swapRoute = await getSwapRoute(chainName, tokenToSellAddress, tokenAddress, amountIn);
         return swapRoute;
       }));
 
