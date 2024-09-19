@@ -37,7 +37,7 @@ export const Stats: FC<Props> = ({ priceChange, btcPrice }) => {
   const usdcBalance = Number(formatUnits(balanceOfUsdc, USDC_DECIMALS));
 
   return (
-    <div className="stats-container overflow-x-auto">
+    <div className="stats-container px-8 overflow-x-auto">
       <div className="stats bg-transparent flex-nowrap">
         <div className="stat">
           <div className="stat-title text-sm">BTC Price</div>
