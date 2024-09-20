@@ -106,7 +106,7 @@ export const Stats: FC<Props> = ({ priceChange, btcPrice }) => {
       </div>
       {/* Stats on bigger devices */}
       <div className="stats-container px-8">
-        <div className="mt-4 sm:my-4 flex-nowrap justify-center w-fit mx-auto bg-transparent">
+        <div className="mt-4 sm:my-4 flex-nowrap justify-center w-fit flex mx-auto bg-transparent">
           <div className="stat p-0 sm:p-6">
             <div className="stat-title text-sm">BTC Price</div>
             <div className="stat-figure text-secondary">
