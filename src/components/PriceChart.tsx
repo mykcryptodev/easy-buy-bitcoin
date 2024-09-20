@@ -116,7 +116,6 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
             color: colors.labelTextColor,
             background: colors.buyColor,
           },
-          text: 'Buy',
           textAnchor: 'middle',
           position: 'top',
           offsetY: -10,
@@ -127,6 +126,7 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
           },
         },
         amount: buyWithValueDecimal.valueDecimal,
+        action: "Buy",
       };
     }) ?? [];
 
@@ -149,7 +149,6 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
             color: colors.labelTextColor,
             background: colors.sellColor,
           },
-          text: 'Sell',
           textAnchor: 'middle',
           position: 'top',
           offsetY: -10,
@@ -159,7 +158,8 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
             show: true,
           },
         },
-        amount: sellWithValueDecimal.valueDecimal
+        amount: sellWithValueDecimal.valueDecimal,
+        action: "Sell",
       };
     }) ?? [];
 
@@ -263,7 +263,7 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
               const { action, amount } = annotation;
               actionText = `
                 <div class="tooltip-action text-${action === 'Buy' ? 'success' : 'error'}">
-                  ${action}: ${amount} BTC
+                  ${action === 'Buy' ? 'You bought' : 'You sold'}: ${amount} BTC
                 </div>
               `;
             }
@@ -315,21 +315,21 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
             ...annotation,
             marker: {
               ...annotation.marker,
-              strokeColor: annotation.label.text === 'Buy' ? colors.buyColor : colors.sellColor,
+              strokeColor: annotation.action === 'Buy' ? colors.buyColor : colors.sellColor,
             },
             label: {
               ...annotation.label,
-              borderColor: annotation.label.text === 'Buy' ? colors.buyColor : colors.sellColor,
+              borderColor: annotation.action === 'Buy' ? colors.buyColor : colors.sellColor,
               style: {
                 ...annotation.label.style,
-                background: annotation.label.text === 'Buy' ? colors.buyColor : colors.sellColor,
+                background: annotation.action === 'Buy' ? colors.buyColor : colors.sellColor,
               },
             },
           })),
         },
       } as ApexOptions,
     };
-  }, [aggregatedData, buys, sells, isDarkMode]);
+  }, [aggregatedData, buys, sells, isDarkMode, colors.chartLine, colors.chartFill, colors.markerFillColor, colors.buyColor, colors.labelTextColor, colors.sellColor, colors.background, colors.text]);
 
   if (typeof window === 'undefined' || !isMounted) return null;
   
