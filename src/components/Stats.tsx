@@ -57,7 +57,7 @@ export const Stats: FC<Props> = ({ priceChange, btcPrice }) => {
         href={onRampURL}
         passHref
         rel="noopener noreferrer"
-        className="flex items-center gap-1"
+        className={`flex items-center gap-1 ${address && usdcBalance === 0 ? "text-accent" : ''}`}
       >
           <WalletAdd02Icon className="h-4 w-4" />
           Add money

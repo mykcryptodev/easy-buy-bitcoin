@@ -4,15 +4,15 @@ import { PayEmbed } from "thirdweb/react";
 import { client, USDC } from "~/constants";
 
 type Props = {
-  button: ReactNode;
+  children: ReactNode;
 }
-export const BuyCrypto: FC<Props> = ({ button }) => {
+export const BuyCrypto: FC<Props> = ({ children }) => {
   return (
     <>
     
       {/* The button to open modal */}
       <label htmlFor="credit-card-modal" className="">
-        {button}
+        {children}
       </label>
 
       {/* Put this part before </body> tag */}

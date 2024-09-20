@@ -95,7 +95,7 @@ export const Sell: FC<Props> = ({ goBack, /*onSuccess*/ }) => {
         step="0.00000001"
         value={amount}
         onChange={handleAmountChange}
-        className="input input-bordered"
+        className="input input-bordered w-full"
         placeholder="Enter amount in BTC"
       />
       <Transaction 

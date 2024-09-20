@@ -15,6 +15,7 @@ import { parseEther, zeroAddress, erc20Abi, encodeFunctionData, parseUnits } fro
 import useDebounce from "~/hooks/useDebounce";
 import { env } from "~/env";
 import { ArrowLeft02Icon } from "hugeicons-react";
+import FundAlert from "~/components/FundAlert";
 
 type Props = {
   goBack: () => void;
@@ -100,9 +101,10 @@ export const Buy: FC<Props> = ({ goBack, /*onSuccess*/ }) => {
         step="0.01"
         value={amount}
         onChange={handleAmountChange}
-        className="input input-lg input-bordered"
+        className="input input-lg input-bordered w-full"
         placeholder="Enter amount in USD"
       />
+      <FundAlert />
       <Transaction 
         chainId={base.id} 
         calls={calls}
