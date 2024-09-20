@@ -10,6 +10,7 @@ import { useAccount, useReadContracts } from "wagmi";
 import { erc20Abi, zeroAddress, formatUnits } from "viem";
 import { CB_BTC, CB_BTC_DECIMALS, USDC, USDC_DECIMALS } from "~/constants";
 import BuyCrypto from "./BuyCrypto";
+import { WalletDropdownFundLink } from "@coinbase/onchainkit/wallet";
 
 type Props = {
   priceChange: number;
@@ -17,7 +18,6 @@ type Props = {
 };
 
 export const Stats: FC<Props> = ({ priceChange, btcPrice }) => {
-  console.log({ priceChange });
   const { address } = useAccount();
 
   const { data } = useReadContracts({
@@ -46,30 +46,6 @@ export const Stats: FC<Props> = ({ priceChange, btcPrice }) => {
     <>
       {/* Bottom Navigation on Mobile */}
       <div className="sm:hidden btm-nav">
-        {/* <button>
-          <BitcoinGraphIcon className="h-8 w-8 stroke-2" />
-          <span className="btm-nav-label">
-            <div className="font-bold">
-              <AnimatedNumber
-                value={btcPrice}
-                formatOptions={{
-                  style: "currency",
-                  currency: "usd",
-                  maximumFractionDigits: 0,
-                }}
-              />
-            </div>
-            <div
-              className={`stat-desc ${priceChange > 0 ? "text-success" : ""}`}
-            >
-              {priceChange > 0 && <span>+</span>}
-              {priceChange.toLocaleString([], {
-                maximumFractionDigits: 2,
-              })}
-              % today
-            </div>
-          </span>
-        </button> */}
         <button>
           <BitcoinWalletIcon className="h-8 w-8 stroke-2" />
           <span className="btm-nav-label">
@@ -98,7 +74,6 @@ export const Stats: FC<Props> = ({ priceChange, btcPrice }) => {
                   maximumFractionDigits: 2,
                 }}
               />
-
             </div>
             <div className="stat-desc flex items-center gap-1">
               <BuyCrypto
@@ -174,13 +149,10 @@ export const Stats: FC<Props> = ({ priceChange, btcPrice }) => {
               />
             </div>
             <div className="stat-desc flex items-center gap-1">
-              <BuyCrypto
-                button={
-                  <div className="btn btn-ghost btn-xs flex items-center gap-1 font-normal">
-                    <WalletAdd02Icon className="h-4 w-4" />
-                    Add money
-                  </div>
-                }
+              <WalletDropdownFundLink 
+                className={`force-btn-xs-ock ${!address ? 'invisible' : ''}`}
+                icon={<WalletAdd02Icon className="h-4 w-4" />}
+                text="Add money"
               />
             </div>
           </div>

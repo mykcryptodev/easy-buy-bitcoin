@@ -24,6 +24,17 @@ body {
   fill: theme('colors.base-content');
 }
 
+.force-btn-xs-ock {
+  @apply !bg-base-100 !p-0 font-normal;
+}
+.force-btn-xs-ock span {
+  @apply text-xs opacity-50;
+  font-family: 'Segment';
+}
+.force-btn-xs-ock div {
+  @apply left-0;
+}
+
 /* remove up and down arrows from number inputs */
 @layer base {
   input[type="number"]::-webkit-inner-spin-button,

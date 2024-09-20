@@ -35,8 +35,8 @@ export function Wallet({ className }: Props) {
             <Name />
             <Address className={color.foregroundMuted} />
           </Identity>
-          <WalletDropdownDisconnect />
           <WalletDropdownFundLink />
+          <WalletDropdownDisconnect />
         </WalletDropdown>
       </OnchainKitWallet>
       {!account.address && (
