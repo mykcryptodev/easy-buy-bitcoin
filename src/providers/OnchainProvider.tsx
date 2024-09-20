@@ -14,6 +14,7 @@ export const wagmiConfig = createConfig({
       appName: 'Buy Bitcoin',
       preference: 'smartWalletOnly',
       version: '4',
+      appLogoUrl: "https://easybuybitcoin.com/images/cbbtc.png",
     }),
   ],
   ssr: true,
