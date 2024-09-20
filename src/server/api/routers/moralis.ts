@@ -97,6 +97,7 @@ export const moralisRouter = createTRPCRouter({
         });
       }
       
+      // TODO: This is limited to the last 100 transfers unless we paginate
       // let cursor: string | undefined;
       // const allTransfers: GetWalletTokenTransfersResponseAdapter['result'] = [];
 
@@ -124,8 +125,28 @@ export const moralisRouter = createTRPCRouter({
 
       const buys = response.result.filter(transfer => isAddressEqual(transfer.toAddress.checksum, getAddress(address)));
       const sells = response.result.filter(transfer => isAddressEqual(transfer.fromAddress.checksum, getAddress(address)));
-      console.log({ sells });
 
       return { buys, sells }
+    }),
+  getTokenPriceAtBlock: publicProcedure
+    .input(z.object({
+      chainId: z.number(),
+      tokenAddress: z.string(),
+      blockNumber: z.number(),
+    }))
+    .mutation(async ({ input }) => {
+      if (!Moralis.Core.isStarted) {
+        await Moralis.start({
+          apiKey: env.MORALIS_API_KEY,
+        });
+      }
+
+      const response = await Moralis.EvmApi.token.getTokenPrice({
+        chain: toHex(input.chainId),
+        address: getAddress(input.tokenAddress),
+        toBlock: input.blockNumber,
+      });
+
+      return response.result;
     }),
 });

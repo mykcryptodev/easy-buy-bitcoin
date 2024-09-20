@@ -9,6 +9,7 @@ type SeriesData = {
   name: string;
   data: (number | null)[];
 };
+type AnnotationType = { action: 'Buy' | 'Sell'; amount: string };
 
 type Props = {
   buys?: GetWalletTokenTransfersResponseAdapter['result'];
@@ -23,6 +24,7 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
+  // const { mutateAsync: getTokenPriceAtBlock } = api.moralis.getTokenPriceAtBlock.useMutation();
 
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
@@ -54,14 +56,19 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
   const options = useMemo(() => {
     if (!aggregatedData) return null;
 
+    const findClosestDataPoint = (timestamp: number) => {
+      return aggregatedData.reduce((prev, curr) => 
+        Math.abs(curr[0]! - timestamp) < Math.abs(prev[0]! - timestamp) ? curr : prev
+      );
+    };
+
     const buyAnnotations = buys?.map(buy => {
       const buyTime = new Date(buy.blockTimestamp).getTime();
-      const closestDataPoint = aggregatedData.reduce((prev, curr) => 
-        Math.abs(curr[0]! - buyTime) < Math.abs(prev[0]! - buyTime) ? curr : prev
-      );
+      const [x, y] = findClosestDataPoint(buyTime);
+      const buyWithValueDecimal = buy as unknown as { valueDecimal: string };
       return {
-        x: closestDataPoint[0],
-        y: closestDataPoint[1],
+        x,
+        y,
         marker: {
           size: 6,
           fillColor: "#fff",
@@ -82,18 +89,19 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
           hover: {
             show: true,
           },
-        }
+        },
+        amount: buyWithValueDecimal.valueDecimal,
       };
     }) ?? [];
 
     const sellAnnotations = sells?.map(sell => {
       const sellTime = new Date(sell.blockTimestamp).getTime();
-      const closestDataPoint = aggregatedData.reduce((prev, curr) => 
-        Math.abs(curr[0]! - sellTime) < Math.abs(prev[0]! - sellTime) ? curr : prev
-      );
+      const [x, y] = findClosestDataPoint(sellTime);
+      console.log({ sell })
+      const sellWithValueDecimal = sell as unknown as { valueDecimal: string };
       return {
-        x: closestDataPoint[0],
-        y: closestDataPoint[1],
+        x,
+        y,
         marker: {
           size: 6,
           fillColor: "#fff",
@@ -114,9 +122,15 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
           hover: {
             show: true,
           },
-        }
+        },
+        amount: sellWithValueDecimal.valueDecimal
       };
     }) ?? [];
+
+    const annotationMap = new Map<number, AnnotationType>([
+      ...buyAnnotations.map(a => [a.x!, { action: 'Buy', amount: a.amount }] as const),
+      ...sellAnnotations.map(a => [a.x!, { action: 'Sell', amount: a.amount }] as const)
+    ]);
 
     return {
       series: [{
@@ -204,10 +218,22 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
               maximumFractionDigits: 2,
             });
             
+            const annotation = annotationMap.get(timestamp);
+            let actionText = '';
+            if (annotation) {
+              const { action, amount } = annotation;
+              actionText = `
+                <div class="tooltip-action text-${action === 'Buy' ? 'success' : 'error'}">
+                  ${action}: ${amount} BTC
+                </div>
+              `;
+            }
+            
             return `
               <div class="custom-tooltip px-2 py-1 text-center">
                 <div class="tooltip-date text-xs">${formattedDate}</div>
                 <div class="tooltip-price font-bold">${formattedPrice}</div>
+                ${actionText}
               </div>
             `;
           },
