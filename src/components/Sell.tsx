@@ -14,7 +14,7 @@ type Props = {
   onSuccess: () => void;
 };
 
-export const Sell: FC<Props> = ({ goBack, onSuccess }) => {
+export const Sell: FC<Props> = ({ goBack, /*onSuccess*/ }) => {
   const account = useAccount();
 
   const { data: btcPrice } = api.chainlink.getAssetPrice.useQuery({

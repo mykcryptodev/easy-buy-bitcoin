@@ -5,6 +5,32 @@ import { api } from "~/utils/api";
 import type { ApexOptions } from "apexcharts";
 import { type GetWalletTokenTransfersResponseAdapter } from "moralis/common-evm-utils";
 
+const darkModeColors = {
+  text: '#A6ADBA',
+  background: '#2A303C',
+  primary: '#36D399',
+  error: '#F87272',
+  chartLine: 'rgba(75, 85, 99, 0.65)',
+  chartFill: 'rgba(75, 85, 99, 0.5)',
+  buyColor: 'rgba(74, 222, 128, 0.4)',  // Softer green for dark mode
+  sellColor: 'rgba(248, 113, 113, 0.4)', // Softer red for dark mode
+  markerFillColor: '#2A303C', // Added marker filler for dark mode
+  labelTextColor: '#2A2A2A', // Changed label text color to a soft black for dark mode
+};
+
+const lightModeColors = {
+  text: '#374151',
+  background: '#FFFFFF',
+  primary: '#36D399',
+  error: '#F87272',
+  chartLine: '#60A5FA',
+  chartFill: 'rgba(96, 165, 250, 0.3)',
+  buyColor: '#36D399',  // Original green for light mode
+  sellColor: '#F87272', // Original red for light mode
+  markerFillColor: '#FFFFFF', // Added marker filler for light mode
+  labelTextColor: '#FFFFFF', // Added label text color for light mode
+};
+
 type SeriesData = {
   name: string;
   data: (number | null)[];
@@ -27,10 +53,20 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
   // const { mutateAsync: getTokenPriceAtBlock } = api.moralis.getTokenPriceAtBlock.useMutation();
 
   const [isMounted, setIsMounted] = useState<boolean>(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    setIsDarkMode(darkModeMediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
+    darkModeMediaQuery.addEventListener('change', handleChange);
+
+    return () => darkModeMediaQuery.removeEventListener('change', handleChange);
   }, []);
+
+  const colors = isDarkMode ? darkModeColors : lightModeColors;
 
   const aggregatedData = useMemo(() => {
     if (!rawData) return null;
@@ -71,14 +107,14 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
         y,
         marker: {
           size: 6,
-          fillColor: "#fff",
-          strokeColor: "#36D399",
+          fillColor: colors.markerFillColor,
+          strokeColor: colors.buyColor,
         },
         label: {
-          borderColor: "#36D399",
+          borderColor: colors.buyColor,
           style: {
-            color: "#fff",
-            background: "#36D399",
+            color: colors.labelTextColor,
+            background: colors.buyColor,
           },
           text: 'Buy',
           textAnchor: 'middle',
@@ -104,14 +140,14 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
         y,
         marker: {
           size: 6,
-          fillColor: "#fff",
-          strokeColor: "#F87272",
+          fillColor: colors.markerFillColor,
+          strokeColor: colors.sellColor,
         },
         label: {
-          borderColor: "#F87272",
+          borderColor: colors.sellColor,
           style: {
-            color: "#fff",
-            background: "#F87272",
+            color: colors.labelTextColor,
+            background: colors.sellColor,
           },
           text: 'Sell',
           textAnchor: 'middle',
@@ -147,13 +183,15 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
           toolbar: {
             show: false,
           },
+          background: 'transparent',
         },
         dataLabels: {
           enabled: false
         },
         stroke: {
           curve: "smooth",
-          width: 0,
+          width: isDarkMode ? 2 : 0,
+          colors: isDarkMode ? [colors.chartLine] : undefined,
         },
         labels: aggregatedData.map(([x]) => new Date(x!).toLocaleDateString()),
         xaxis: {
@@ -186,7 +224,7 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
           },
         },
         legend: {
-          show: false // Hide the legend to remove extra space
+          show: false
         },
         grid: {
           show: false,
@@ -197,6 +235,7 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
         },
         tooltip: {
           enabled: true,
+          theme: isDarkMode ? 'dark' : 'light',
           custom: ({ series, seriesIndex, dataPointIndex, w } : {
             series: number[][],
             seriesIndex: number,
@@ -230,7 +269,7 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
             }
             
             return `
-              <div class="custom-tooltip px-2 py-1 text-center">
+              <div class="custom-tooltip px-2 py-1 text-center" style="background: ${colors.background}; color: ${colors.text};">
                 <div class="tooltip-date text-xs">${formattedDate}</div>
                 <div class="tooltip-price font-bold">${formattedPrice}</div>
                 ${actionText}
@@ -254,18 +293,43 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
           gradient: {
             gradientToColors: undefined,
             shadeIntensity: 1,
-            opacityFrom: 0.7,
-            opacityTo: 0.9,
+            opacityFrom: isDarkMode ? 0.7 : 0.7,
+            opacityTo: isDarkMode ? 0.9 : 0.9,
             stops: [0, 90, 100],
-            colorStops: []
+            colorStops: isDarkMode ? [
+              {
+                offset: 0,
+                color: colors.chartFill,
+                opacity: 0.7
+              },
+              {
+                offset: 100,
+                color: colors.chartFill,
+                opacity: 0.1
+              }
+            ] : []
           }
         },
         annotations: {
-          points: [...buyAnnotations, ...sellAnnotations],
+          points: [...buyAnnotations, ...sellAnnotations].map(annotation => ({
+            ...annotation,
+            marker: {
+              ...annotation.marker,
+              strokeColor: annotation.label.text === 'Buy' ? colors.buyColor : colors.sellColor,
+            },
+            label: {
+              ...annotation.label,
+              borderColor: annotation.label.text === 'Buy' ? colors.buyColor : colors.sellColor,
+              style: {
+                ...annotation.label.style,
+                background: annotation.label.text === 'Buy' ? colors.buyColor : colors.sellColor,
+              },
+            },
+          })),
         },
       } as ApexOptions,
     };
-  }, [aggregatedData, buys, sells]);
+  }, [aggregatedData, buys, sells, isDarkMode]);
 
   if (typeof window === 'undefined' || !isMounted) return null;
   
