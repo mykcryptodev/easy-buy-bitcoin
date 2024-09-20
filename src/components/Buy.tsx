@@ -20,7 +20,7 @@ type Props = {
   goBack: () => void;
   onSuccess: () => void;
 };
-export const Buy: FC<Props> = ({ goBack, onSuccess }) => {
+export const Buy: FC<Props> = ({ goBack, /*onSuccess*/ }) => {
   const account = useAccount();
   const { data: etherPrice } = api.chainlink.getAssetPrice.useQuery({
     asset: "ETH",

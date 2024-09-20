@@ -9,7 +9,9 @@ import AnimatedNumber from "~/components/AnimatedNumber";
 import { useAccount, useReadContracts } from "wagmi";
 import { erc20Abi, zeroAddress, formatUnits } from "viem";
 import { CB_BTC, CB_BTC_DECIMALS, USDC, USDC_DECIMALS } from "~/constants";
-import { WalletDropdownFundLink } from "@coinbase/onchainkit/wallet";
+import { generateOnRampURL } from "@coinbase/cbpay-js";
+import Link from "next/link";
+import { env } from "~/env";
 
 type Props = {
   priceChange: number;
@@ -40,6 +42,28 @@ export const Stats: FC<Props> = ({ priceChange, btcPrice }) => {
 
   const btcBalance = Number(formatUnits(balanceOfBtc, CB_BTC_DECIMALS));
   const usdcBalance = Number(formatUnits(balanceOfUsdc, USDC_DECIMALS));
+
+  const FundWalletButton: FC = () => {
+    const onRampURL = generateOnRampURL({
+      appId: env.NEXT_PUBLIC_COINBASE_PROJECT_ID,
+      defaultExperience: "buy",
+      destinationWallets: [
+        { address: address ?? "", blockchains: ["base"], assets: ["USDC"] }
+      ]
+    });
+
+    return (
+      <Link 
+        href={onRampURL}
+        passHref
+        rel="noopener noreferrer"
+        className="flex items-center gap-1"
+      >
+          <WalletAdd02Icon className="h-4 w-4" />
+          Add money
+      </Link>
+    )
+  };
 
   return (
     <>
@@ -75,11 +99,7 @@ export const Stats: FC<Props> = ({ priceChange, btcPrice }) => {
               />
             </div>
             <div className="stat-desc flex items-center gap-1">
-              <WalletDropdownFundLink 
-                className={`force-btn-xs-ock ${!address ? 'invisible' : ''}`}
-                icon={<WalletAdd02Icon className="h-4 w-4" />}
-                text="Add money"
-              />
+              <FundWalletButton />
             </div>
           </span>
         </button>
@@ -145,11 +165,7 @@ export const Stats: FC<Props> = ({ priceChange, btcPrice }) => {
               />
             </div>
             <div className="stat-desc flex items-center gap-1">
-              <WalletDropdownFundLink 
-                className={`force-btn-xs-ock ${!address ? 'invisible' : ''}`}
-                icon={<WalletAdd02Icon className="h-4 w-4" />}
-                text="Add money"
-              />
+              <FundWalletButton />
             </div>
           </div>
         </div>

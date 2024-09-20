@@ -11,6 +11,9 @@ export const env = createEnv({
     COINGECKO_API_KEY: z.string(),
     KYBERSWAP_CLIENT_ID: z.string(),
     MORALIS_API_KEY: z.string(),
+    COINBASE_API_KEY_NAME: z.string(),
+    COINBASE_SECRET: z.string(),
+    COINBASE_PROJECT_ID: z.string(),
   },
 
   /**
@@ -22,6 +25,7 @@ export const env = createEnv({
     NEXT_PUBLIC_THIRDWEB_CLIENT_ID: z.string(),
     NEXT_PUBLIC_CDP_API_KEY: z.string(),
     NEXT_PUBLIC_CDP_PAYMASTER_URL: z.string(),
+    NEXT_PUBLIC_COINBASE_PROJECT_ID: z.string(),
   },
 
   /**
@@ -33,6 +37,10 @@ export const env = createEnv({
     COINGECKO_API_KEY: process.env.COINGECKO_API_KEY,
     KYBERSWAP_CLIENT_ID: process.env.KYBERSWAP_CLIENT_ID,
     MORALIS_API_KEY: process.env.MORALIS_API_KEY,
+    COINBASE_API_KEY_NAME: process.env.COINBASE_API_KEY_NAME,
+    COINBASE_SECRET: process.env.COINBASE_SECRET,
+    COINBASE_PROJECT_ID: process.env.COINBASE_PROJECT_ID,
+    NEXT_PUBLIC_COINBASE_PROJECT_ID: process.env.NEXT_PUBLIC_COINBASE_PROJECT_ID,
     NEXT_PUBLIC_THIRDWEB_CLIENT_ID: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID,
     NEXT_PUBLIC_CDP_API_KEY: process.env.NEXT_PUBLIC_CDP_API_KEY,
     NEXT_PUBLIC_CDP_PAYMASTER_URL: process.env.NEXT_PUBLIC_CDP_PAYMASTER_URL,
