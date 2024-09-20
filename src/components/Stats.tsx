@@ -9,7 +9,6 @@ import AnimatedNumber from "~/components/AnimatedNumber";
 import { useAccount, useReadContracts } from "wagmi";
 import { erc20Abi, zeroAddress, formatUnits } from "viem";
 import { CB_BTC, CB_BTC_DECIMALS, USDC, USDC_DECIMALS } from "~/constants";
-import BuyCrypto from "./BuyCrypto";
 import { WalletDropdownFundLink } from "@coinbase/onchainkit/wallet";
 
 type Props = {
@@ -76,13 +75,10 @@ export const Stats: FC<Props> = ({ priceChange, btcPrice }) => {
               />
             </div>
             <div className="stat-desc flex items-center gap-1">
-              <BuyCrypto
-                button={
-                  <div className="flex items-center gap-1 font-normal">
-                    <WalletAdd02Icon className="h-3 w-3" />
-                    Add money
-                  </div>
-                }
+              <WalletDropdownFundLink 
+                className={`force-btn-xs-ock ${!address ? 'invisible' : ''}`}
+                icon={<WalletAdd02Icon className="h-4 w-4" />}
+                text="Add money"
               />
             </div>
           </span>
