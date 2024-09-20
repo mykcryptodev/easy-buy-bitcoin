@@ -24,15 +24,12 @@ body {
   fill: theme('colors.base-content');
 }
 
-.force-btn-xs-ock {
-  @apply !bg-transparent !p-0 font-normal;
+.span-primary-content-text-color span {
+  color: theme('colors.primary-content');
 }
-.force-btn-xs-ock span {
-  @apply text-xs opacity-50;
-  font-family: 'Segment';
-}
-.force-btn-xs-ock div {
-  @apply left-0;
+
+.span-secondary-content-text-color span {
+  color: theme('colors.secondary-content');
 }
 
 /* remove up and down arrows from number inputs */

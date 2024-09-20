@@ -115,7 +115,7 @@ export const Buy: FC<Props> = ({ goBack, /*onSuccess*/ }) => {
         <TransactionButton
           text={`${encodedDataIsLoading ? "Loading..." : `Buy ${Number(amount).toLocaleString([], { style: "currency", currency: "USD" })} of Bitcoin`}`}
           disabled={encodedDataIsLoading}
-          className="bg-none! hover:bg-none! p-0 text-primary-content! btn btn-primary btn-lg"
+          className="bg-none! hover:bg-none! p-0 span-primary-content-text-color btn btn-primary btn-lg"
         />
         <TransactionToast>
           <TransactionToastIcon />
