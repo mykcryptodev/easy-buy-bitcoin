@@ -10,7 +10,7 @@ import dynamic from "next/dynamic";
 import Stats from "~/components/Stats";
 import { zeroAddress } from "viem";
 import { base } from "viem/chains";
-import { CB_BTC } from "~/constants";
+import { CB_BTC, CB_BTC_COINGECKO_ID } from "~/constants";
 
 const PriceChart = dynamic(() => import("~/components/PriceChart"), { ssr: false });
 
@@ -18,7 +18,7 @@ const Home: FC = () => {
   const { address } = useAccount();
   const [price, setPrice] = useState<number>(45000);
   const { data, refetch: refetchPnl } = api.coingecko.getTokenCardDataById.useQuery({
-    id: "coinbase-wrapped-btc",
+    id: CB_BTC_COINGECKO_ID,
   });
   useEffect(() => {
     if (!data)  return;

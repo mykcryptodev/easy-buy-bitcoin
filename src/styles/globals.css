@@ -25,7 +25,7 @@ body {
 }
 
 .force-btn-xs-ock {
-  @apply !bg-base-100 !p-0 font-normal;
+  @apply !bg-transparent !p-0 font-normal;
 }
 .force-btn-xs-ock span {
   @apply text-xs opacity-50;
