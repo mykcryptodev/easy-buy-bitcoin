@@ -96,7 +96,7 @@ export const Buy: FC<Props> = ({ goBack, onSuccess }) => {
   const latestTxLink = useMemo(() => {
     return 'https://basescan.org/tx/' + transactionResponse?.transactionReceipts[
       transactionResponse.transactionReceipts.length - 1
-    ]?.transactionHash ?? "";
+    ]?.transactionHash;
   }, [transactionResponse]);
 
   useEffect(() => {
