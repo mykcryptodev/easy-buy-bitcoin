@@ -4,7 +4,7 @@ import {
   Wallet01Icon,
   WalletAdd02Icon,
 } from "hugeicons-react";
-import type { FC } from "react";
+import { useEffect, type FC } from "react";
 import AnimatedNumber from "~/components/AnimatedNumber";
 import { useAccount, useReadContracts } from "wagmi";
 import { erc20Abi, zeroAddress, formatUnits } from "viem";
@@ -16,12 +16,13 @@ import { env } from "~/env";
 type Props = {
   priceChange: number;
   btcPrice: number;
+  isFetched: boolean;
 };
 
-export const Stats: FC<Props> = ({ priceChange, btcPrice }) => {
+export const Stats: FC<Props> = ({ priceChange, btcPrice, isFetched }) => {
   const { address } = useAccount();
 
-  const { data } = useReadContracts({
+  const { data, refetch } = useReadContracts({
     contracts: [
       {
         address: CB_BTC,
@@ -42,6 +43,13 @@ export const Stats: FC<Props> = ({ priceChange, btcPrice }) => {
 
   const btcBalance = Number(formatUnits(balanceOfBtc, CB_BTC_DECIMALS));
   const usdcBalance = Number(formatUnits(balanceOfUsdc, USDC_DECIMALS));
+
+  useEffect(() => {
+    if (isFetched) {
+      console.log('refetching the balances...')
+      void refetch();
+    }
+  }, [isFetched, refetch]);
 
   const FundWalletButton: FC = () => {
     const onRampURL = generateOnRampURL({

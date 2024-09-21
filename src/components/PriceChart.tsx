@@ -133,7 +133,6 @@ export const PriceChart: FC<Props> = ({ buys, sells }) => {
     const sellAnnotations = sells?.map(sell => {
       const sellTime = new Date(sell.blockTimestamp).getTime();
       const [x, y] = findClosestDataPoint(sellTime);
-      console.log({ sell })
       const sellWithValueDecimal = sell as unknown as { valueDecimal: string };
       return {
         x,

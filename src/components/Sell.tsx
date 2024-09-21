@@ -1,20 +1,22 @@
-import { type FC, useMemo, useState } from "react";
+import { type FC, useEffect, useMemo, useState } from "react";
 import useDebounce from "~/hooks/useDebounce";
 import { api } from "~/utils/api";
 import { zeroAddress, encodeFunctionData, parseUnits, erc20Abi } from "viem";
 import { useAccount } from "wagmi";
 import { base } from "viem/chains";
-import { Transaction, TransactionButton, TransactionToast, TransactionToastAction, TransactionToastIcon, TransactionToastLabel } from "@coinbase/onchainkit/transaction";
+import { Transaction, TransactionButton, type TransactionResponse, TransactionToast, TransactionToastAction, TransactionToastIcon, TransactionToastLabel } from "@coinbase/onchainkit/transaction";
 import { env } from "~/env";
 import { CB_BTC, CB_BTC_DECIMALS, USDC } from "~/constants";
 import { ArrowLeft02Icon } from "hugeicons-react";
+import Confetti from "~/components/Confetti";
+import Link from "next/link";
 
 type Props = {
   goBack: () => void;
   onSuccess: () => void;
 };
 
-export const Sell: FC<Props> = ({ goBack, /*onSuccess*/ }) => {
+export const Sell: FC<Props> = ({ goBack, onSuccess }) => {
   const account = useAccount();
 
   const { data: btcPrice } = api.chainlink.getAssetPrice.useQuery({
@@ -79,6 +81,27 @@ export const Sell: FC<Props> = ({ goBack, /*onSuccess*/ }) => {
     setAmount(e.target.value);
   };
 
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [transactionCompleted, setTransactionCompleted] = useState(false);
+  const [transactionResponse, setTransactionResponse] = useState<TransactionResponse>();
+
+  const latestTxLink = useMemo(() => {
+    return 'https://basescan.org/tx/' + transactionResponse?.transactionReceipts[
+      transactionResponse.transactionReceipts.length - 1
+    ]?.transactionHash;
+  }, [transactionResponse]);
+
+  useEffect(() => {
+    if (transactionCompleted) {
+      setShowConfetti(true);
+      const timer = setTimeout(() => {
+        setShowConfetti(false);
+        setTransactionCompleted(false);
+      }, 7000);
+      return () => clearTimeout(timer);
+    }
+  }, [transactionCompleted]);
+  
   return (
     <div className="flex flex-col items-start gap-2">
       <button className="btn btn-neutral btn-xs btn-ghost" onClick={goBack}>
@@ -98,26 +121,40 @@ export const Sell: FC<Props> = ({ goBack, /*onSuccess*/ }) => {
         className="input input-bordered w-full"
         placeholder="Enter amount in BTC"
       />
-      <Transaction 
-        chainId={base.id} 
-        calls={calls}
-        capabilities={{
-          paymasterService: {
-            url: env.NEXT_PUBLIC_CDP_PAYMASTER_URL,
-          }
-        }}
-      >
-        <TransactionButton
-          text={`${encodedDataIsLoading ? "Loading..." : `Sell ${Number(amount).toLocaleString([], { style: "currency", currency: "USD" })} of Bitcoin`}`}
-          disabled={encodedDataIsLoading}
-          className="bg-none! hover:bg-none! p-0 span-secondary-content-text-color btn btn-secondary btn-lg"
-        />
-        <TransactionToast>
-          <TransactionToastIcon />
-          <TransactionToastLabel />
-          <TransactionToastAction />
-        </TransactionToast>
-      </Transaction>
+      {!transactionCompleted && (
+        <Transaction 
+          chainId={base.id} 
+          calls={calls}
+          onSuccess={(response) => {
+            console.log({ success: true });
+            onSuccess();
+            setTransactionCompleted(true);
+            setTransactionResponse(response);
+          }}
+          capabilities={{
+            paymasterService: {
+              url: env.NEXT_PUBLIC_CDP_PAYMASTER_URL,
+            }
+          }}
+        >
+          <TransactionButton
+            text={`${encodedDataIsLoading ? "Loading..." : `Sell ${Number(amount).toLocaleString([], { style: "currency", currency: "USD" })} of Bitcoin`}`}
+            disabled={encodedDataIsLoading}
+            className="bg-none! hover:bg-none! p-0 span-secondary-content-text-color btn btn-secondary btn-lg"
+          />
+          <TransactionToast>
+            <TransactionToastIcon />
+            <TransactionToastLabel />
+            <TransactionToastAction />
+          </TransactionToast>
+        </Transaction>
+      )}
+      {transactionResponse && (
+        <Link href={latestTxLink} target="_blank" rel="noopener noreferrer" className="text-primary text-center w-full">
+          View receipt
+        </Link>
+      )}
+      {showConfetti && <Confetti image="usdc" />}
     </div>
   );
 };
