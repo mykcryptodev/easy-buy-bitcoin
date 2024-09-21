@@ -17,7 +17,7 @@ const PriceChart = dynamic(() => import("~/components/PriceChart"), { ssr: false
 const Home: FC = () => {
   const { address } = useAccount();
   const [price, setPrice] = useState<number>(45000);
-  const { data, refetch: refetchPnl } = api.coingecko.getTokenCardDataById.useQuery({
+  const { data, refetch: refetchTokenData } = api.coingecko.getTokenCardDataById.useQuery({
     id: CB_BTC_COINGECKO_ID,
   });
   useEffect(() => {
@@ -25,7 +25,7 @@ const Home: FC = () => {
     setPrice(data.current_price);
   }, [data, data?.current_price]);
 
-  const { data: pnl } = api.moralis.getWalletPnl.useQuery({
+  const { data: pnl, isRefetching, refetch: refetchPnl } = api.moralis.getWalletPnl.useQuery({
     address: address ?? zeroAddress,
     chainId: base.id,
     tokens: [CB_BTC],
@@ -35,11 +35,14 @@ const Home: FC = () => {
     enabled: !!address,
   });
 
-  const [statsKey, setStatsKey] = useState<number>(0);
-
   const refetchData = () => {
     void refetchPnl();
-    setStatsKey((prev) => prev + 1);
+    void refetchTokenData();
+    // wait 6 seconds for the transaction to be confirmed
+    setTimeout(() => {
+      void refetchPnl();
+      void refetchTokenData();
+    }, 6000);
   };
 
   const [activeAction, setActiveAction] = useState<"buy" | "sell" | undefined>();
@@ -62,9 +65,10 @@ const Home: FC = () => {
           <div className="flex flex-col items-center justify-center max-w-md gap-2 z-10 rounded-2xl">
             {data && (
               <Stats
-                key={statsKey}
+                // key={statsKey}
                 priceChange={data.price_change_percentage_24h}
                 btcPrice={price}
+                isFetched={isRefetching}
               />
             )}
             <div className="text-7xl tracking-tighter font-bold my-8">Buy Bitcoin</div>
