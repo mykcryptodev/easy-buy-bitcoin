@@ -9,9 +9,9 @@ import AnimatedNumber from "~/components/AnimatedNumber";
 import { useAccount, useReadContracts } from "wagmi";
 import { erc20Abi, zeroAddress, formatUnits } from "viem";
 import { CB_BTC, CB_BTC_DECIMALS, USDC, USDC_DECIMALS } from "~/constants";
-import { generateOnRampURL } from "@coinbase/cbpay-js";
 import Link from "next/link";
 import { env } from "~/env";
+import { getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
 
 type Props = {
   priceChange: number;
@@ -52,17 +52,17 @@ export const Stats: FC<Props> = ({ priceChange, btcPrice, isFetched }) => {
   }, [isFetched, refetch]);
 
   const FundWalletButton: FC = () => {
-    const onRampURL = generateOnRampURL({
-      appId: env.NEXT_PUBLIC_COINBASE_PROJECT_ID,
-      defaultExperience: "buy",
-      destinationWallets: [
-        { address: address ?? "", blockchains: ["base"], assets: ["USDC"] }
-      ]
+    const onrampBuyUrl = getOnrampBuyUrl({
+      projectId: env.NEXT_PUBLIC_COINBASE_PROJECT_ID,
+      addresses: {
+        [address ?? ""]: ["base"],
+      },
+      assets: ["USDC"]
     });
 
     return (
       <Link 
-        href={onRampURL}
+        href={onrampBuyUrl}
         passHref
         rel="noopener noreferrer"
         className={`flex items-center gap-1 ${address && usdcBalance === 0 ? "text-accent" : ''}`}

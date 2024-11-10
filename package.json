@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@coinbase/cbpay-js": "^2.2.1",
-    "@coinbase/onchainkit": "^0.32.0",
+    "@coinbase/onchainkit": "^0.35.5",
     "@t3-oss/env-nextjs": "^0.10.1",
     "@tanstack/react-query": "^5.50.0",
     "@trpc/client": "^11.0.0-rc.446",
